@@ -25,10 +25,13 @@ struct WebcamService {
             throw WebcamServiceError.missingAPIKey
         }
 
+        // v3's location filter is a single combined value: "lat,lon,radiusKm"
+        // (not separate `near`/`radius` params — those are silently ignored,
+        // which was causing Windy to fall back to its default/popular listing
+        // instead of actually filtering by location).
         var components = URLComponents(string: baseURL)
         components?.queryItems = [
-            URLQueryItem(name: "near", value: "\(resort.latitude),\(resort.longitude)"),
-            URLQueryItem(name: "radius", value: "\(radiusKm)"),
+            URLQueryItem(name: "nearby", value: "\(resort.latitude),\(resort.longitude),\(radiusKm)"),
             URLQueryItem(name: "limit", value: "\(limit)"),
             URLQueryItem(name: "include", value: "images,location,urls"),
             URLQueryItem(name: "lang", value: "en"),
@@ -39,7 +42,7 @@ struct WebcamService {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(WebcamAPIConfig.apiKey, forHTTPHeaderField: "x-windy-api-key")
+        request.setValue(WebcamAPIConfig.apiKey, forHTTPHeaderField: "X-WINDY-API-KEY")
 
         let data: Data
         do {
