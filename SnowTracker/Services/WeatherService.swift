@@ -1,0 +1,77 @@
+import Foundation
+
+enum WeatherServiceError: LocalizedError {
+    case invalidURL
+    case requestFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL: return "Couldn't build the weather request."
+        case .requestFailed: return "Couldn't reach the weather service. Check your connection and try again."
+        }
+    }
+}
+
+/// Fetches current conditions and a multi-day forecast from the free Open-Meteo API.
+/// No API key required: https://open-meteo.com
+struct WeatherService {
+    static let shared = WeatherService()
+
+    private let baseURL = "https://api.open-meteo.com/v1/forecast"
+
+    func fetchSnapshot(for resort: Resort, units: UnitsPreference) async throws -> WeatherSnapshot {
+        var components = URLComponents(string: baseURL)
+        components?.queryItems = [
+            URLQueryItem(name: "latitude", value: "\(resort.latitude)"),
+            URLQueryItem(name: "longitude", value: "\(resort.longitude)"),
+            URLQueryItem(name: "elevation", value: "\(resort.elevationMeters)"),
+            URLQueryItem(name: "current", value: "temperature_2m,weather_code,wind_speed_10m,snowfall"),
+            URLQueryItem(name: "daily", value: "weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,wind_speed_10m_max"),
+            URLQueryItem(name: "temperature_unit", value: units.temperatureUnit),
+            URLQueryItem(name: "wind_speed_unit", value: units.windSpeedUnit),
+            URLQueryItem(name: "precipitation_unit", value: units.precipitationUnit),
+            URLQueryItem(name: "forecast_days", value: "7"),
+            URLQueryItem(name: "timezone", value: "auto"),
+        ]
+
+        guard let url = components?.url else {
+            throw WeatherServiceError.invalidURL
+        }
+
+        let data: Data
+        do {
+            let (responseData, response) = try await URLSession.shared.data(from: url)
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                throw WeatherServiceError.requestFailed
+            }
+            data = responseData
+        } catch {
+            throw WeatherServiceError.requestFailed
+        }
+
+        let decoded = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
+        return Self.mapToSnapshot(decoded, units: units)
+    }
+
+    private static func mapToSnapshot(_ response: OpenMeteoResponse, units: UnitsPreference) -> WeatherSnapshot {
+        let current = CurrentConditions(
+            temperature: response.current.temperature2m,
+            weatherCode: response.current.weatherCode,
+            windSpeed: response.current.windSpeed10m,
+            snowfallNow: response.current.snowfall
+        )
+
+        let daily = response.daily.time.indices.map { index in
+            ForecastDay(
+                dateString: response.daily.time[index],
+                weatherCode: response.daily.weatherCode[index],
+                highTemp: response.daily.temperature2mMax[index],
+                lowTemp: response.daily.temperature2mMin[index],
+                snowfall: response.daily.snowfallSum[index],
+                windSpeed: response.daily.windSpeed10mMax[index]
+            )
+        }
+
+        return WeatherSnapshot(current: current, daily: daily, units: units)
+    }
+}
