@@ -50,8 +50,13 @@ struct ResortDetailView: View {
 
                         VStack(spacing: 0) {
                             ForEach(snapshot.daily) { day in
-                                ForecastRowView(day: day, units: snapshot.units)
-                                    .padding(.horizontal)
+                                ForecastRowView(
+                                    day: day,
+                                    units: snapshot.units,
+                                    weekLow: weekLow(in: snapshot),
+                                    weekHigh: weekHigh(in: snapshot)
+                                )
+                                .padding(.horizontal)
                                 if day.id != snapshot.daily.last?.id {
                                     Divider().padding(.leading)
                                 }
@@ -105,6 +110,14 @@ struct ResortDetailView: View {
         .refreshable {
             await load()
         }
+    }
+
+    private func weekLow(in snapshot: WeatherSnapshot) -> Double {
+        snapshot.daily.map(\.lowTemp).min() ?? 0
+    }
+
+    private func weekHigh(in snapshot: WeatherSnapshot) -> Double {
+        snapshot.daily.map(\.highTemp).max() ?? 0
     }
 
     private func load() async {
