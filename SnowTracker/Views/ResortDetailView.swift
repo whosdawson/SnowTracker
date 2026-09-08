@@ -17,6 +17,22 @@ struct ResortDetailView: View {
                     CurrentConditionsView(current: snapshot.current, units: snapshot.units)
                         .padding(.horizontal)
 
+                    NavigationLink {
+                        WebcamGridView(resort: resort)
+                    } label: {
+                        HStack {
+                            Label("Live Cameras", systemImage: "video.fill")
+                                .font(.headline)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 16).fill(.thinMaterial))
+                        .padding(.horizontal)
+                    }
+                    .buttonStyle(.plain)
+
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
                             Text("7-Day Forecast")
@@ -66,6 +82,13 @@ struct ResortDetailView: View {
         .navigationTitle(resort.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    WebcamGridView(resort: resort)
+                } label: {
+                    Image(systemName: "video")
+                }
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     favorites.toggle(resort)

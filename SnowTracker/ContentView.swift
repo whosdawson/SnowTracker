@@ -1,17 +1,20 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        TabView {
-            ForecastTabView()
-                .tabItem {
-                    Label("Forecast", systemImage: "snowflake")
-                }
+    @EnvironmentObject private var unitsSettings: UnitsSettings
 
-            CamerasTabView()
-                .tabItem {
-                    Label("Cameras", systemImage: "video")
+    var body: some View {
+        NavigationStack {
+            ResortPickerList(title: "SnowTracker", searchPrompt: "Search any resort or mountain") { resort in
+                ResortDetailView(resort: resort)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(unitsSettings.preference == .metric ? "°C" : "°F") {
+                        unitsSettings.toggle()
+                    }
                 }
+            }
         }
     }
 }

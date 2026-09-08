@@ -6,17 +6,17 @@ snowfall, and pull up nearby webcams — all in-app.
 
 ## Features
 
-- **Forecast tab** — search any resort/mountain by name (not limited to a
-  fixed list), plus a curated "Popular Resorts" shortcut list. Tap a resort
-  to see current temp/wind/snowfall and a 7-day forecast with daily snowfall
-  totals.
-- **Cameras tab** — search a resort and browse public webcams near it. Tap a
-  camera to view its live snapshot, or open the live page in an embedded
-  in-app web view (no need to leave the app).
-- **Favorites** — star a resort from either tab to pin it to the top of the
-  list; persisted on-device.
+- **Search any resort/mountain** by name (not limited to a fixed list), plus
+  a curated "Popular Resorts" shortcut list.
+- **Resort detail** — current temp/wind/snowfall and a 7-day forecast with
+  daily snowfall totals. From here, tap **Live Cameras** (card or toolbar
+  icon) to browse that resort's public webcams. Tap a camera to view its
+  live snapshot, or open the live page in an embedded in-app web view (no
+  need to leave the app).
+- **Favorites** — star a resort to pin it to the top of the list; persisted
+  on-device.
 - **Units** — toggle between Metric (°C, cm, km/h) and Imperial (°F, in, mph)
-  from the Forecast tab.
+  from the toolbar.
 
 ## Data sources
 
@@ -39,7 +39,7 @@ snowfall, and pull up nearby webcams — all in-app.
    ```swift
    static let apiKey = "YOUR_KEY_HERE"
    ```
-   Without a key, the Cameras tab still works but shows a message asking
+   Without a key, the cameras screen still works but shows a message asking
    you to configure one.
 3. Build & run on iOS 16+ (simulator or device) — no other setup needed.
 
@@ -48,7 +48,7 @@ snowfall, and pull up nearby webcams — all in-app.
 ```
 SnowTracker/
   SnowTrackerApp.swift        App entry point
-  ContentView.swift           Root tab bar (Forecast / Cameras)
+  ContentView.swift           Root screen: search/browse resorts
   Models/                     Resort, weather, and webcam data types
   Services/                   Networking (Open-Meteo, Windy), persistence
   Views/                      SwiftUI screens and components
