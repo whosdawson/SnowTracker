@@ -51,4 +51,6 @@ struct WindyLocation: Decodable {
     let city: String?
     let region: String?
     let country: String?
+    let latitude: Double?
+    let longitude: Double?
 }
