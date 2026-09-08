@@ -17,13 +17,15 @@ enum YouTubeServiceError: LocalizedError {
 /// Finds a resort's official live-cam YouTube streams, if any are currently
 /// live, via the YouTube Data API v3. Results are reused as `Webcam` values
 /// (same shape as Windy webcams) so they share the existing card/detail UI —
-/// `detailPageURL` points at the YouTube embed player, which plays inline in
-/// the in-app web view.
+/// `detailPageURL` points at YouTube's normal watch page (not the /embed/
+/// iframe player), which plays inline in the in-app web view for any live
+/// stream regardless of whether the channel has third-party embedding
+/// disabled — that restriction only applies to the constrained iframe embed
+/// API, not to loading youtube.com itself.
 struct YouTubeService {
     static let shared = YouTubeService()
 
     private let searchURL = "https://www.googleapis.com/youtube/v3/search"
-    private let videosURL = "https://www.googleapis.com/youtube/v3/videos"
 
     func searchLiveStreams(for resort: Resort, maxResults: Int = 6) async throws -> [Webcam] {
         guard YouTubeAPIConfig.isConfigured else {
@@ -58,47 +60,7 @@ struct YouTubeService {
         }
 
         let decoded = try JSONDecoder().decode(YouTubeSearchResponse.self, from: data)
-        let candidates = decoded.items ?? []
-        let videoIds = candidates.compactMap { $0.id?.videoId }
-
-        // Many official/brand channels disable embedding for their live
-        // streams, which shows as a "video player configuration error" in
-        // an embedded web view even though the stream itself is fine. Drop
-        // those before they ever reach the UI. If this check itself fails
-        // (network hiccup), fail open and show the unfiltered candidates
-        // rather than losing all results over it.
-        if let embeddableIds = try? await fetchEmbeddableVideoIds(videoIds) {
-            return candidates
-                .filter { embeddableIds.contains($0.id?.videoId ?? "") }
-                .compactMap { $0.asWebcam }
-        }
-        return candidates.compactMap { $0.asWebcam }
-    }
-
-    private func fetchEmbeddableVideoIds(_ ids: [String]) async throws -> Set<String> {
-        guard !ids.isEmpty else { return [] }
-
-        var components = URLComponents(string: videosURL)
-        components?.queryItems = [
-            URLQueryItem(name: "part", value: "status"),
-            URLQueryItem(name: "id", value: ids.joined(separator: ",")),
-            URLQueryItem(name: "key", value: YouTubeAPIConfig.apiKey),
-        ]
-
-        guard let url = components?.url else {
-            throw WeatherServiceError.invalidURL
-        }
-
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw YouTubeServiceError.requestFailed
-        }
-
-        let decoded = try JSONDecoder().decode(YouTubeVideosResponse.self, from: data)
-        let embeddable = (decoded.items ?? [])
-            .filter { $0.status?.embeddable == true }
-            .compactMap { $0.id }
-        return Set(embeddable)
+        return (decoded.items ?? []).compactMap { $0.asWebcam }
     }
 }
 
@@ -112,12 +74,13 @@ private struct YouTubeSearchItem: Decodable {
 
     var asWebcam: Webcam? {
         guard let videoId = id?.videoId else { return nil }
+        let watchURL = URL(string: "https://www.youtube.com/watch?v=\(videoId)")
         return Webcam(
             id: "yt-\(videoId)",
             title: snippet?.title ?? "Live Stream",
             previewImageURL: snippet?.thumbnails?.medium?.url.flatMap(URL.init(string:)),
-            detailPageURL: URL(string: "https://www.youtube.com/embed/\(videoId)?autoplay=1&playsinline=1"),
-            externalURL: URL(string: "https://www.youtube.com/watch?v=\(videoId)"),
+            detailPageURL: watchURL,
+            externalURL: watchURL,
             locationLabel: snippet?.channelTitle
         )
     }
@@ -139,17 +102,4 @@ private struct YouTubeThumbnails: Decodable {
 
 private struct YouTubeThumbnail: Decodable {
     let url: String?
-}
-
-private struct YouTubeVideosResponse: Decodable {
-    let items: [YouTubeVideoStatusItem]?
-}
-
-private struct YouTubeVideoStatusItem: Decodable {
-    let id: String?
-    let status: YouTubeVideoStatus?
-}
-
-private struct YouTubeVideoStatus: Decodable {
-    let embeddable: Bool?
 }

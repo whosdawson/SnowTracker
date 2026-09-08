@@ -7,11 +7,8 @@ struct Webcam: Identifiable, Hashable {
     let previewImageURL: URL?
     /// Loaded in the embedded in-app web view when the user taps "Watch Live".
     let detailPageURL: URL?
-    /// Opened in the system browser/app as a fallback — e.g. for a YouTube
-    /// live stream, this is the normal watch page rather than the /embed/
-    /// URL, so it still works if the embed itself is blocked or errors
-    /// (some channels disable embedding, which shows as a player error
-    /// in-app but plays fine in the YouTube app or Safari).
+    /// Opened in the system browser/app (rather than the in-app web view)
+    /// as a fallback, e.g. if a page just won't load correctly embedded.
     let externalURL: URL?
     let locationLabel: String?
 }
