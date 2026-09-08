@@ -9,6 +9,14 @@ struct Webcam: Identifiable, Hashable {
     let locationLabel: String?
 }
 
+/// Navigation value for "show the camera grid for this resort". A distinct
+/// type (rather than reusing `Resort`) so it can have its own
+/// `navigationDestination`, separate from Resort's (which goes to
+/// ResortDetailView).
+struct WebcamGridRoute: Hashable {
+    let resort: Resort
+}
+
 // MARK: - Windy Webcams API v3 response (decoding layer)
 // Docs: https://api.windy.com/webcams/docs
 

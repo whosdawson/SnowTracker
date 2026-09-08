@@ -45,9 +45,8 @@ struct WebcamGridView: View {
         }
         .navigationTitle(resort.name)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: Webcam.self) { webcam in
-            WebcamDetailView(webcam: webcam)
-        }
+        // Webcam's navigationDestination is declared once at the stack root
+        // (ContentView) rather than here — see the comment there.
         .task {
             await load()
         }

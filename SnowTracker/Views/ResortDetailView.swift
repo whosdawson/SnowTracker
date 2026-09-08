@@ -22,9 +22,7 @@ struct ResortDetailView: View {
                     CurrentConditionsView(current: snapshot.current, units: snapshot.units)
                         .padding(.horizontal)
 
-                    NavigationLink {
-                        WebcamGridView(resort: resort)
-                    } label: {
+                    NavigationLink(value: WebcamGridRoute(resort: resort)) {
                         HStack {
                             Label("Live Cameras", systemImage: "video.fill")
                                 .font(.headline)
@@ -88,9 +86,7 @@ struct ResortDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink {
-                    WebcamGridView(resort: resort)
-                } label: {
+                NavigationLink(value: WebcamGridRoute(resort: resort)) {
                     Image(systemName: "video")
                 }
             }
