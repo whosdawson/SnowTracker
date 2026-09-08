@@ -1,25 +1,13 @@
 import SwiftUI
 
-/// Shows a single webcam in-app: a large snapshot plus, when available, the
-/// live webcam page rendered in an embedded web view — no need to leave the app.
+/// Shows a single webcam in-app: the live page/stream in an embedded web
+/// view whenever one's available, otherwise a static snapshot.
 struct WebcamDetailView: View {
     let webcam: Webcam
-    @State private var showLive: Bool
-
-    /// Entries with no snapshot (e.g. an official webcam page link) go
-    /// straight to the live view — there's nothing else to show first.
-    init(webcam: Webcam) {
-        self.webcam = webcam
-        _showLive = State(initialValue: webcam.previewImageURL == nil && webcam.detailPageURL != nil)
-    }
-
-    private var canToggle: Bool {
-        webcam.previewImageURL != nil && webcam.detailPageURL != nil
-    }
 
     var body: some View {
-        VStack(spacing: 0) {
-            if showLive, let url = webcam.detailPageURL {
+        Group {
+            if let url = webcam.detailPageURL {
                 WebView(url: url)
             } else if let url = webcam.previewImageURL {
                 AsyncImage(url: url) { phase in
@@ -35,24 +23,14 @@ struct WebcamDetailView: View {
             } else {
                 placeholder
             }
-
-            if canToggle {
-                Button(showLive ? "Show Snapshot" : "Watch Live In-App") {
-                    showLive.toggle()
-                }
-                .buttonStyle(.borderedProminent)
-                .padding()
-            }
         }
         .navigationTitle(webcam.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if let externalURL = webcam.externalURL {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    // Escape hatch: some channels/pages error out or refuse
-                    // to embed (e.g. "video player configuration error" for
-                    // YouTube streams with embedding disabled) but work fine
-                    // opened directly.
+                    // Escape hatch: some pages just won't load correctly
+                    // embedded but work fine opened directly.
                     Link(destination: externalURL) {
                         Image(systemName: "arrow.up.forward.app")
                     }

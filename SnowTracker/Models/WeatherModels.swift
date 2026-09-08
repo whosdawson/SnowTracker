@@ -10,7 +10,37 @@ struct CurrentConditions {
     let snowfallNow: Double
 }
 
-struct ForecastDay: Identifiable {
+struct HourlyForecast: Identifiable, Hashable {
+    let id = UUID()
+    /// "yyyy-MM-dd'T'HH:mm"
+    let timeString: String
+    let temperature: Double
+    let snowfall: Double
+    let weatherCode: Int
+    let windSpeed: Double
+
+    /// Short hour label, e.g. "2 PM".
+    var hourLabel: String {
+        guard let date = HourlyForecast.formatter.date(from: timeString) else { return timeString }
+        return HourlyForecast.labelFormatter.string(from: date)
+    }
+
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+
+    private static let labelFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h a"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+}
+
+struct ForecastDay: Identifiable, Hashable {
     let id = UUID()
     let dateString: String
     let weatherCode: Int
@@ -18,11 +48,29 @@ struct ForecastDay: Identifiable {
     let lowTemp: Double
     let snowfall: Double
     let windSpeed: Double
+    let windGusts: Double?
+    let precipitationProbability: Int?
+    let uvIndexMax: Double?
+    /// "yyyy-MM-dd'T'HH:mm"
+    let sunrise: String?
+    let sunset: String?
+    let hourly: [HourlyForecast]
 
     /// Short weekday label, e.g. "Mon", computed from the "yyyy-MM-dd" date string.
     var weekdayLabel: String {
         guard let date = ForecastDay.dayFormatter.date(from: dateString) else { return dateString }
         return ForecastDay.weekdayFormatter.string(from: date)
+    }
+
+    /// Full label, e.g. "Wednesday, Nov 20".
+    var fullDateLabel: String {
+        guard let date = ForecastDay.dayFormatter.date(from: dateString) else { return dateString }
+        return ForecastDay.fullDateFormatter.string(from: date)
+    }
+
+    static func timeLabel(_ timeString: String?) -> String? {
+        guard let timeString, let date = HourlyForecast.timeParser.date(from: timeString) else { return nil }
+        return HourlyForecast.timeLabelFormatter.string(from: date)
     }
 
     private static let dayFormatter: DateFormatter = {
@@ -35,6 +83,30 @@ struct ForecastDay: Identifiable {
     private static let weekdayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+
+    private static let fullDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+}
+
+// fileprivate (not private) so ForecastDay.timeLabel, in the same file, can use these too.
+fileprivate extension HourlyForecast {
+    static let timeParser: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+
+    static let timeLabelFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
         formatter.timeZone = TimeZone(identifier: "UTC")
         return formatter
     }()
@@ -99,6 +171,7 @@ enum WeatherCode {
 struct OpenMeteoResponse: Decodable {
     let current: CurrentBlock
     let daily: DailyBlock
+    let hourly: HourlyBlock?
 }
 
 struct CurrentBlock: Decodable {
@@ -122,6 +195,11 @@ struct DailyBlock: Decodable {
     let temperature2mMin: [Double]
     let snowfallSum: [Double]
     let windSpeed10mMax: [Double]
+    let windGusts10mMax: [Double]?
+    let precipitationProbabilityMax: [Int]?
+    let uvIndexMax: [Double]?
+    let sunrise: [String]?
+    let sunset: [String]?
 
     enum CodingKeys: String, CodingKey {
         case time
@@ -130,5 +208,35 @@ struct DailyBlock: Decodable {
         case temperature2mMin = "temperature_2m_min"
         case snowfallSum = "snowfall_sum"
         case windSpeed10mMax = "wind_speed_10m_max"
+        case windGusts10mMax = "wind_gusts_10m_max"
+        case precipitationProbabilityMax = "precipitation_probability_max"
+        case uvIndexMax = "uv_index_max"
+        case sunrise
+        case sunset
+    }
+}
+
+struct HourlyBlock: Decodable {
+    let time: [String]
+    let temperature2m: [Double]
+    let snowfall: [Double]
+    let weatherCode: [Int]
+    let windSpeed10m: [Double]
+
+    enum CodingKeys: String, CodingKey {
+        case time
+        case temperature2m = "temperature_2m"
+        case snowfall
+        case weatherCode = "weather_code"
+        case windSpeed10m = "wind_speed_10m"
+    }
+}
+
+extension Array {
+    /// Returns nil instead of crashing when the index is out of bounds —
+    /// used for the optional daily-detail arrays, which may come back
+    /// shorter than `time` if Open-Meteo omits a field.
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }

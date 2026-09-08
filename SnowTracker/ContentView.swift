@@ -26,6 +26,9 @@ struct ContentView: View {
             .navigationDestination(for: Webcam.self) { webcam in
                 WebcamDetailView(webcam: webcam)
             }
+            .navigationDestination(for: ForecastDay.self) { day in
+                DayDetailView(day: day, units: unitsSettings.preference)
+            }
         }
     }
 }

@@ -5,33 +5,41 @@ struct ForecastRowView: View {
     let units: UnitsPreference
 
     var body: some View {
-        HStack {
-            Text(day.weekdayLabel)
-                .font(.subheadline.weight(.medium))
-                .frame(width: 44, alignment: .leading)
+        NavigationLink(value: day) {
+            HStack {
+                Text(day.weekdayLabel)
+                    .font(.subheadline.weight(.medium))
+                    .frame(width: 44, alignment: .leading)
 
-            Image(systemName: WeatherCode.symbol(for: day.weatherCode))
-                .symbolRenderingMode(.multicolor)
-                .frame(width: 28)
+                Image(systemName: WeatherCode.symbol(for: day.weatherCode))
+                    .symbolRenderingMode(.multicolor)
+                    .frame(width: 28)
 
-            if day.snowfall > 0 {
-                Label("\(formatted(day.snowfall)) \(units.snowSuffix)", systemImage: "snowflake")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.blue)
-                    .frame(width: 90, alignment: .leading)
-            } else {
-                Text("—")
+                if day.snowfall > 0 {
+                    Label("\(formatted(day.snowfall)) \(units.snowSuffix)", systemImage: "snowflake")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.blue)
+                        .frame(width: 90, alignment: .leading)
+                } else {
+                    Text("—")
+                        .foregroundStyle(.secondary)
+                        .frame(width: 90, alignment: .leading)
+                }
+
+                Spacer()
+
+                Text("\(Int(day.lowTemp.rounded()))° / \(Int(day.highTemp.rounded()))°\(units.temperatureSuffix)")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .frame(width: 90, alignment: .leading)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
             }
-
-            Spacer()
-
-            Text("\(Int(day.lowTemp.rounded()))° / \(Int(day.highTemp.rounded()))°\(units.temperatureSuffix)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            .padding(.vertical, 4)
+            .contentShape(Rectangle())
         }
-        .padding(.vertical, 4)
+        .buttonStyle(.plain)
     }
 
     private func formatted(_ value: Double) -> String {

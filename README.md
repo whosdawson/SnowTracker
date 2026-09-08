@@ -11,12 +11,17 @@ all in-app.
   a curated "Popular Resorts" shortcut list.
 - **Resort detail** — current temp/wind/snowfall and a 7-day forecast with
   daily snowfall totals. A season-status badge shows **Open Now**, **Opens
-  &lt;date&gt;**, or **Season Closed** for resorts with curated dates.
+  &lt;date&gt;**, or **Season Closed** for resorts with curated dates. Tap
+  any day for an in-depth view: hourly temperature/snowfall strip, a
+  snowfall-by-hour chart, wind gusts, precipitation chance, UV index, and
+  sunrise/sunset.
 - **Cameras** — tap **Live Cameras** (card or toolbar icon) on a resort to
   browse up to three sources: a curated **official webcam page**, live
   **YouTube streams**, and nearby **Windy webcams** (sorted by real distance
-  from the resort). Tap any camera to view its snapshot, or watch live in an
-  embedded in-app web view — no need to leave the app.
+  from the resort). Tap any camera to watch live immediately in an embedded
+  in-app web view — no need to leave the app. YouTube streams load the
+  normal watch page (not the restricted iframe embed), so they play in-app
+  regardless of a channel's third-party embedding setting.
 - **Favorites** — star a resort to pin it to the top of the list; persisted
   on-device.
 - **Snow alert notifications** — favorited resorts are checked for notable
