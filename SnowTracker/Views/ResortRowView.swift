@@ -15,6 +15,7 @@ struct ResortRowView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            SeasonStatusBadge(status: resort.seasonStatus)
             Button(action: onToggleFavorite) {
                 Image(systemName: isFavorite ? "star.fill" : "star")
                     .foregroundStyle(isFavorite ? .yellow : .secondary)

@@ -13,6 +13,11 @@ struct ResortDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                if resort.seasonStatus != .unknown {
+                    SeasonStatusBadge(status: resort.seasonStatus)
+                        .padding(.horizontal)
+                }
+
                 if let snapshot {
                     CurrentConditionsView(current: snapshot.current, units: snapshot.units)
                         .padding(.horizontal)

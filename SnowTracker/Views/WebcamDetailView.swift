@@ -4,7 +4,18 @@ import SwiftUI
 /// live webcam page rendered in an embedded web view — no need to leave the app.
 struct WebcamDetailView: View {
     let webcam: Webcam
-    @State private var showLive = false
+    @State private var showLive: Bool
+
+    /// Entries with no snapshot (e.g. an official webcam page link) go
+    /// straight to the live view — there's nothing else to show first.
+    init(webcam: Webcam) {
+        self.webcam = webcam
+        _showLive = State(initialValue: webcam.previewImageURL == nil && webcam.detailPageURL != nil)
+    }
+
+    private var canToggle: Bool {
+        webcam.previewImageURL != nil && webcam.detailPageURL != nil
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,7 +36,7 @@ struct WebcamDetailView: View {
                 placeholder
             }
 
-            if webcam.detailPageURL != nil {
+            if canToggle {
                 Button(showLive ? "Show Snapshot" : "Watch Live In-App") {
                     showLive.toggle()
                 }
