@@ -46,6 +46,19 @@ struct WebcamDetailView: View {
         }
         .navigationTitle(webcam.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if let externalURL = webcam.externalURL {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    // Escape hatch: some channels/pages error out or refuse
+                    // to embed (e.g. "video player configuration error" for
+                    // YouTube streams with embedding disabled) but work fine
+                    // opened directly.
+                    Link(destination: externalURL) {
+                        Image(systemName: "arrow.up.forward.app")
+                    }
+                }
+            }
+        }
     }
 
     private var placeholder: some View {

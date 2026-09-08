@@ -109,6 +109,7 @@ struct WebcamGridView: View {
                 title: "\(resort.name) Official Cams",
                 previewImageURL: nil,
                 detailPageURL: url,
+                externalURL: url,
                 locationLabel: "Official resort webcam page"
             )
         }
