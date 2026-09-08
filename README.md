@@ -82,9 +82,10 @@ SnowTracker/
   the resort's own.
 - `officialWebcamURL`, `plannedOpeningDate`, and `plannedClosingDate` in
   `resorts.json` are curated by hand and only present for a subset of
-  resorts (10 official links; 8 with real 2026-27 season dates as of this
-  writing). A resort without these just shows no badge/section rather than
-  a guess — dates especially need refreshing each season since resorts
-  announce them a few months ahead and can adjust for conditions.
+  resorts (21 official links — all 11 bundled European resorts plus 10
+  elsewhere; 16 with real 2026-27 season dates as of this writing). A
+  resort without these just shows no badge/section rather than a guess —
+  dates especially need refreshing each season since resorts announce them
+  a few months ahead and can adjust for conditions.
 - No backend required — the app talks directly to Open-Meteo, Windy, and
   YouTube.
