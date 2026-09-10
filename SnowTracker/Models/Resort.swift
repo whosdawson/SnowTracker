@@ -13,11 +13,36 @@ struct Resort: Identifiable, Codable, Hashable {
 
     /// Official resort webcam page, curated by hand for well-known resorts.
     /// Resorts found via live search won't have one, which is expected.
-    let officialWebcamURL: String? = nil
+    let officialWebcamURL: String?
     /// Planned opening/closing date for the current season, "yyyy-MM-dd".
     /// Curated for a subset of resorts; nil means unknown rather than closed.
-    let plannedOpeningDate: String? = nil
-    let plannedClosingDate: String? = nil
+    let plannedOpeningDate: String?
+    let plannedClosingDate: String?
+
+    // A default *property* value here (e.g. `= nil`) would silently break
+    // JSON decoding: Swift's synthesized Decodable ignores the JSON value
+    // entirely and always uses the default instead, for that property.
+    // A custom initializer with default *parameter* values doesn't have
+    // that problem, and still lets GeocodingService build a Resort (for
+    // live-searched resorts) without specifying these three.
+    init(
+        id: String, name: String, region: String, country: String,
+        latitude: Double, longitude: Double, elevationMeters: Double,
+        officialWebcamURL: String? = nil,
+        plannedOpeningDate: String? = nil,
+        plannedClosingDate: String? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.region = region
+        self.country = country
+        self.latitude = latitude
+        self.longitude = longitude
+        self.elevationMeters = elevationMeters
+        self.officialWebcamURL = officialWebcamURL
+        self.plannedOpeningDate = plannedOpeningDate
+        self.plannedClosingDate = plannedClosingDate
+    }
 
     var subtitle: String {
         "\(region), \(country)"
