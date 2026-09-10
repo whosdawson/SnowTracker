@@ -95,11 +95,13 @@ SnowTracker/
   the resort's own.
 - `officialWebcamURL`, `plannedOpeningDate`, and `plannedClosingDate` in
   `resorts.json` are curated by hand and only present for a subset of
-  resorts (29 official links — including all 10 bundled Italian resorts
-  and 11 other European ones; 18 with real 2026-27 season dates as of this
-  writing). A resort without these just shows no badge/section rather than
-  a guess — dates especially need refreshing each season since resorts
-  announce them a few months ahead and can adjust for conditions. Bormio,
+  resorts (29 official links — every bundled European resort included;
+  27 with real 2026-27 season dates as of this writing). A resort without
+  a date shows a "Check opening date" link instead (its official webcam
+  page, or a web search as a last resort) rather than a guess — Verbier,
+  Kitzbühel, and Madonna di Campiglio haven't announced theirs yet.
+  Dates especially need refreshing each season since resorts announce
+  them a few months ahead and can adjust for conditions. Bormio,
   Sestriere, and Folgaria don't have a clear single "official" webcam
   domain, so those three link to a well-established third-party live-cam
   aggregator (SkylineWebcams/Feratel) instead.

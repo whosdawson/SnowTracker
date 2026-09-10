@@ -22,6 +22,13 @@ struct ResortDetailView: View {
                 if resort.seasonStatus != .unknown {
                     SeasonStatusBadge(status: resort.seasonStatus)
                         .padding(.horizontal)
+                } else {
+                    Link(destination: seasonCheckURL) {
+                        Label("Check opening date", systemImage: "calendar.badge.questionmark")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal)
                 }
 
                 if let snapshot {
@@ -120,6 +127,19 @@ struct ResortDetailView: View {
         .refreshable {
             await load()
         }
+    }
+
+    /// Falls back to the resort's official webcam page (most likely to list
+    /// season dates) or, failing that, a web search — so there's always
+    /// somewhere to check, even for resorts with no curated data at all.
+    private var seasonCheckURL: URL {
+        if let webcamURL = resort.officialWebcamURL, let url = URL(string: webcamURL) {
+            return url
+        }
+        let query = "\(resort.name) ski resort opening date"
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return URL(string: "https://www.google.com/search?q=\(query)")
+            ?? URL(string: "https://www.google.com")!
     }
 
     private func weekLow(in snapshot: WeatherSnapshot) -> Double {
