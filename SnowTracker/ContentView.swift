@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var unitsSettings: UnitsSettings
+    @State private var showSettings = false
 
     var body: some View {
         NavigationStack {
@@ -13,6 +14,13 @@ struct ContentView: View {
                     Button(unitsSettings.preference == .metric ? "°C" : "°F") {
                         Haptics.toggle()
                         unitsSettings.toggle()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
                     }
                 }
             }
@@ -29,6 +37,16 @@ struct ContentView: View {
             }
             .navigationDestination(for: ForecastDay.self) { day in
                 DayDetailView(day: day, units: unitsSettings.preference)
+            }
+        }
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsView()
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Done") { showSettings = false }
+                        }
+                    }
             }
         }
     }

@@ -15,11 +15,46 @@ final class NotificationManager {
     private let snowThresholdCm: Double = 2.0
     private static let lastNotifiedKey = "lastSnowNotificationDates"
 
+    private init() {
+        // Without a delegate, iOS silently drops notifications posted while
+        // the app is in the foreground — which is exactly when the app's own
+        // snow check runs (on becoming active) and when the Settings screen's
+        // "Send Test Notification" button fires. This makes both visible.
+        UNUserNotificationCenter.current().delegate = ForegroundPresenter.shared
+    }
+
+    func authorizationStatus() async -> UNAuthorizationStatus {
+        await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+    }
+
     func requestAuthorizationIfNeeded() async {
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
         guard settings.authorizationStatus == .notDetermined else { return }
         _ = try? await center.requestAuthorization(options: [.alert, .sound, .badge])
+    }
+
+    /// Posts an immediate notification regardless of the once-per-day
+    /// dedupe, so Settings can offer a "does this work?" check.
+    func sendTestNotification() async -> Bool {
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else {
+            return false
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = "❄️ Test Notification"
+        content.body = "If you can see this, SnowTracker notifications are working."
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "test-\(UUID().uuidString)",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+        try? await center.add(request)
+        return true
     }
 
     /// Fetches a fresh, metric forecast for each favorite (independent of the
@@ -66,4 +101,16 @@ final class NotificationManager {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
+}
+
+private final class ForegroundPresenter: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = ForegroundPresenter()
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound, .list])
+    }
 }

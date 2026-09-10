@@ -29,6 +29,9 @@ all in-app.
   notification per resort per day.
 - **Units** — toggle between Metric (°C, cm, km/h) and Imperial (°F, in, mph)
   from the toolbar.
+- **Settings** (gear icon) — notification permission status with a "Send
+  Test Notification" button, units and Popular Resorts toggles, camera API
+  key status, and app version.
 - **A little personality** — the current-conditions card shifts color/mood
   with the weather (gold for clear, indigo for snow, purple for storms)
   with a falling-snow effect when it's actively snowing; playful loading
