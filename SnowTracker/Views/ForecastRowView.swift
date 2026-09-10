@@ -30,7 +30,7 @@ struct ForecastRowView: View {
 
                 temperatureBar
 
-                Text("\(Int(day.highTemp.rounded()))°\(units.temperatureSuffix)")
+                Text("\(Int(day.highTemp.rounded()))\(units.temperatureSuffix)")
                     .font(.subheadline.weight(.medium))
                     .frame(width: 58, alignment: .trailing)
 
