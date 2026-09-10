@@ -11,6 +11,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(unitsSettings.preference == .metric ? "°C" : "°F") {
+                        Haptics.toggle()
                         unitsSettings.toggle()
                     }
                 }

@@ -29,6 +29,11 @@ all in-app.
   notification per resort per day.
 - **Units** — toggle between Metric (°C, cm, km/h) and Imperial (°F, in, mph)
   from the toolbar.
+- **A little personality** — the current-conditions card shifts color/mood
+  with the weather (gold for clear, indigo for snow, purple for storms)
+  with a falling-snow effect when it's actively snowing; playful loading
+  copy and empty states; light haptic feedback and a star bounce on
+  favoriting.
 
 ## Data sources
 

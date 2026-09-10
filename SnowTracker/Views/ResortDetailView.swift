@@ -9,6 +9,12 @@ struct ResortDetailView: View {
     @State private var snapshot: WeatherSnapshot?
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var loadingPhrase = ResortDetailView.loadingPhrases.randomElement()!
+
+    private static let loadingPhrases = [
+        "Waxing the board…", "Checking the lifts…", "Scouting fresh tracks…",
+        "Dusting off the goggles…", "Reading the snow report…",
+    ]
 
     var body: some View {
         ScrollView {
@@ -66,7 +72,7 @@ struct ResortDetailView: View {
                         .padding(.horizontal)
                     }
                 } else if isLoading {
-                    ProgressView("Loading forecast…")
+                    ProgressView(loadingPhrase)
                         .frame(maxWidth: .infinity)
                         .padding(.top, 60)
                 } else if let errorMessage {
@@ -97,10 +103,13 @@ struct ResortDetailView: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
+                    Haptics.toggle()
                     favorites.toggle(resort)
                 } label: {
                     Image(systemName: favorites.isFavorite(resort) ? "star.fill" : "star")
                         .foregroundStyle(favorites.isFavorite(resort) ? .yellow : .primary)
+                        .scaleEffect(favorites.isFavorite(resort) ? 1.15 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.4), value: favorites.isFavorite(resort))
                 }
             }
         }

@@ -4,6 +4,8 @@ struct CurrentConditionsView: View {
     let current: CurrentConditions
     let units: UnitsPreference
 
+    private var isSnowing: Bool { current.snowfallNow >= 0.5 }
+
     var body: some View {
         VStack(spacing: 12) {
             HStack(alignment: .top, spacing: 16) {
@@ -14,14 +16,13 @@ struct CurrentConditionsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(Int(current.temperature.rounded()))\(units.temperatureSuffix)")
                         .font(.system(size: 34, weight: .semibold))
-                    Text(WeatherCode.description(for: current.weatherCode))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    Text(WeatherCode.tagline(for: current.weatherCode, snowfallNow: current.snowfallNow))
+                        .font(.subheadline.weight(.medium))
                 }
                 Spacer()
             }
 
-            Divider()
+            Divider().overlay(.white.opacity(0.3))
 
             HStack {
                 statTile(title: "Snow (this hr)", value: "\(formatted(current.snowfallNow)) \(units.snowSuffix)", icon: "snowflake")
@@ -29,14 +30,28 @@ struct CurrentConditionsView: View {
             }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 16).fill(.thinMaterial))
+        .foregroundStyle(.white)
+        .background(
+            ZStack {
+                LinearGradient(
+                    colors: WeatherCode.moodGradient(for: current.weatherCode),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                Color.black.opacity(0.12)
+                if isSnowing {
+                    SnowfallOverlay()
+                }
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func statTile(title: String, value: String, icon: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Label(title, systemImage: icon)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .opacity(0.85)
             Text(value)
                 .font(.headline)
         }

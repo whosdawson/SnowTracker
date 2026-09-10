@@ -12,8 +12,13 @@ struct WebcamGridView: View {
     @State private var nearbyWebcams: [Webcam] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var loadingPhrase = WebcamGridView.loadingPhrases.randomElement()!
 
     private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
+
+    private static let loadingPhrases = [
+        "Scanning the slopes…", "Panning the peaks…", "Tuning in the feeds…",
+    ]
 
     private var hasAnyResults: Bool {
         officialWebcam != nil || !liveStreams.isEmpty || !nearbyWebcams.isEmpty
@@ -22,7 +27,7 @@ struct WebcamGridView: View {
     var body: some View {
         ScrollView {
             if isLoading && !hasAnyResults {
-                ProgressView("Finding cameras…")
+                ProgressView(loadingPhrase)
                     .padding(.top, 60)
             } else if let errorMessage, !hasAnyResults {
                 errorView(errorMessage)
@@ -77,8 +82,13 @@ struct WebcamGridView: View {
             Image(systemName: "video.slash")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
-            Text("No cameras found near \(resort.name).")
+            Text("No cameras up here yet")
+                .font(.headline)
+            Text("Nothing near \(resort.name) right now — check back once the season gets going.")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
         }
         .padding(.top, 60)
     }

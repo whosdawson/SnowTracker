@@ -16,9 +16,14 @@ struct ResortRowView: View {
             }
             Spacer()
             SeasonStatusBadge(status: resort.seasonStatus)
-            Button(action: onToggleFavorite) {
+            Button {
+                Haptics.toggle()
+                onToggleFavorite()
+            } label: {
                 Image(systemName: isFavorite ? "star.fill" : "star")
                     .foregroundStyle(isFavorite ? .yellow : .secondary)
+                    .scaleEffect(isFavorite ? 1.15 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.4), value: isFavorite)
             }
             .buttonStyle(.plain)
         }

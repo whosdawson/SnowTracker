@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 // MARK: - App-facing models
 
@@ -162,6 +163,36 @@ enum WeatherCode {
         case 95: return "Thunderstorm"
         case 96, 99: return "Thunderstorm w/ hail"
         default: return "Unknown"
+        }
+    }
+
+    /// A mood gradient for the "current conditions" card, so each weather
+    /// type has its own visual character instead of one flat card style.
+    static func moodGradient(for code: Int) -> [Color] {
+        switch code {
+        case 0: return [.orange, .yellow]
+        case 1, 2: return [.blue, .cyan]
+        case 3: return [.gray, .blue.opacity(0.6)]
+        case 45, 48: return [.gray, Color.white.opacity(0.6)]
+        case 51, 53, 55, 61, 63, 65, 80, 81, 82: return [.blue, .indigo]
+        case 71, 73, 75, 77, 85, 86: return [.cyan, .indigo]
+        case 95, 96, 99: return [.purple, .indigo]
+        default: return [.blue, .cyan]
+        }
+    }
+
+    /// A short, personable read on current conditions.
+    static func tagline(for code: Int, snowfallNow: Double) -> String {
+        if snowfallNow >= 0.5 { return "Snowing right now ❄️" }
+        switch code {
+        case 0: return "Bluebird skies ☀️"
+        case 1, 2: return "Mostly clear up there"
+        case 3: return "Overcast, but chill"
+        case 45, 48: return "Foggy on the mountain"
+        case 51, 53, 55, 61, 63, 65, 80, 81, 82: return "Wet out there"
+        case 71, 73, 75, 77, 85, 86: return "Snowing right now ❄️"
+        case 95, 96, 99: return "Stormy — ride safe"
+        default: return "Check conditions"
         }
     }
 }
