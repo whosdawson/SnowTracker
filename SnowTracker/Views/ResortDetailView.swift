@@ -93,6 +93,7 @@ struct ResortDetailView: View {
             }
             .padding(.top)
         }
+        .background(AppBackground())
         .navigationTitle(resort.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

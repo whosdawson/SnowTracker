@@ -19,6 +19,7 @@ struct DayDetailView: View {
             }
             .padding()
         }
+        .background(AppBackground())
         .navigationTitle(day.fullDateLabel)
         .navigationBarTitleDisplayMode(.inline)
     }

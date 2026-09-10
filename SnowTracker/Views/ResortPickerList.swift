@@ -34,10 +34,13 @@ struct ResortPickerList<Destination: View>: View {
                             ProgressView()
                             Text("Searching…").foregroundStyle(.secondary)
                         }
+                        .listRowBackground(Color.clear)
                     } else if let error = dataStore.searchError {
                         Text(error).foregroundStyle(.secondary)
+                            .listRowBackground(Color.clear)
                     } else if dataStore.searchResults.isEmpty {
                         Text("No resorts found for \"\(searchText)\".").foregroundStyle(.secondary)
+                            .listRowBackground(Color.clear)
                     } else {
                         ForEach(dataStore.searchResults) { resort in
                             row(for: resort)
@@ -46,6 +49,8 @@ struct ResortPickerList<Destination: View>: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(AppBackground())
         .searchable(text: $searchText, prompt: searchPrompt)
         .navigationTitle(title)
         .navigationDestination(for: Resort.self) { resort in
@@ -64,5 +69,6 @@ struct ResortPickerList<Destination: View>: View {
                 onToggleFavorite: { favorites.toggle(resort) }
             )
         }
+        .listRowBackground(Color.clear)
     }
 }

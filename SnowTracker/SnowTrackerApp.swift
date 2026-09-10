@@ -13,6 +13,10 @@ struct SnowTrackerApp: App {
                 .environmentObject(favorites)
                 .environmentObject(unitsSettings)
                 .environmentObject(dataStore)
+                // The app commits to one dark, atmospheric look (see
+                // AppBackground) rather than adapting to system light mode,
+                // so the frosted-glass cards render consistently.
+                .preferredColorScheme(.dark)
         }
         .onChange(of: scenePhase) { newPhase in
             guard newPhase == .active else { return }

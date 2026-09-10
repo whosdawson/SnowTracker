@@ -48,6 +48,7 @@ struct WebcamGridView: View {
                 .padding(.vertical)
             }
         }
+        .background(AppBackground())
         .navigationTitle(resort.name)
         .navigationBarTitleDisplayMode(.inline)
         // Webcam's navigationDestination is declared once at the stack root
