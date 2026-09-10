@@ -11,6 +11,7 @@ struct ResortPickerList<Destination: View>: View {
     @EnvironmentObject private var dataStore: ResortDataStore
     @EnvironmentObject private var favorites: FavoritesStore
     @State private var searchText = ""
+    @AppStorage("showPopularResorts") private var showPopularResorts = true
 
     var body: some View {
         List {
@@ -22,10 +23,23 @@ struct ResortPickerList<Destination: View>: View {
                         }
                     }
                 }
-                Section("Popular Resorts") {
-                    ForEach(dataStore.popularResorts) { resort in
-                        row(for: resort)
+                Section {
+                    if showPopularResorts {
+                        ForEach(dataStore.popularResorts) { resort in
+                            row(for: resort)
+                        }
                     }
+                } header: {
+                    Button {
+                        withAnimation { showPopularResorts.toggle() }
+                    } label: {
+                        HStack {
+                            Text("Popular Resorts")
+                            Spacer()
+                            Image(systemName: showPopularResorts ? "chevron.up" : "chevron.down")
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
             } else {
                 Section("Results") {
